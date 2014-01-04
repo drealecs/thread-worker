@@ -1,0 +1,24 @@
+{
+    "name": "drealecs/thread-worker",
+	"type": "library",
+	"description": "PHP Thread Worker library",
+	"keywords": ["thread", "worker"],
+    "license": "MIT",
+	"authors": [
+        {
+            "name": "Alexandru Patranescu",
+            "email": "drealecs@gmail.com"
+        }
+	],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "ThreadWorker": "lib/"
+        }
+    },
+    "config": {
+        "use-include-path": true
+    }
+}
