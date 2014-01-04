@@ -13,7 +13,7 @@ class RemoteTask {
      */
     private $id;
 
-    public function __construct($task, $id)
+    public function __construct(Task $task, $id)
     {
         $this->task = $task;
         $this->id = $id;
@@ -26,6 +26,6 @@ class RemoteTask {
 
     public function getId()
     {
-        return $this->task;
+        return $this->id;
     }
 }
