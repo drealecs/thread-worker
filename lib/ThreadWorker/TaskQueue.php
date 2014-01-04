@@ -34,5 +34,10 @@ abstract class TaskQueue
     /**
      * @return int
      */
-    abstract public function getSize();
-} 
+    abstract public function getQueueSize();
+
+    /**
+     * @return int
+     */
+    abstract public function getWorkingSize();
+}
