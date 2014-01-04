@@ -17,7 +17,10 @@ class Worker {
     {
         while (true) {
             $task = $this->queue->start();
-            $task->getTask()->run();
+            try {
+                $task->getTask()->run();
+            } catch (\Exception $ex) {
+            }
             $this->queue->end($task);
         }
     }
