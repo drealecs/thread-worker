@@ -8,9 +8,12 @@ class Worker {
      */
     private $queue;
 
-    public function __construct($type)
+    /**
+     * @param TaskQueue $queue
+     */
+    public function __construct($queue)
     {
-        $this->queue = new RedisTaskQueue($type);
+        $this->queue = $queue;
     }
 
     public function work()
