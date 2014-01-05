@@ -19,12 +19,37 @@ class Worker {
     public function work()
     {
         while (true) {
-            $task = $this->queue->start();
+            $task = $this->startTask();
             try {
-                $task->getTask()->run();
+                $this->runTask($task);
             } catch (\Exception $ex) {
             }
-            $this->queue->end($task);
+            $this->endTask($task);
         }
     }
+
+    /**
+     * @return RemoteTask
+     */
+    protected function startTask()
+    {
+        return $this->queue->start();
+    }
+
+    /**
+     * @param RemoteTask $task
+     */
+    protected function runTask($task)
+    {
+        $task->getTask()->run();
+    }
+
+    /**
+     * @param RemoteTask $task
+     */
+    protected function endTask($task)
+    {
+        $this->queue->end($task);
+    }
+
 }
