@@ -20,10 +20,7 @@ class Worker {
     {
         while (true) {
             $task = $this->startTask();
-            try {
-                $this->runTask($task);
-            } catch (\Exception $ex) {
-            }
+            $this->runTask($task);
             $this->endTask($task);
         }
     }
@@ -41,7 +38,10 @@ class Worker {
      */
     protected function runTask($task)
     {
-        $task->getTask()->run();
+        try {
+            $task->getTask()->run();
+        } catch (\Exception $ex) {
+        }
     }
 
     /**
