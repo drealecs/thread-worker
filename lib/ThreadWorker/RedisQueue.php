@@ -35,6 +35,8 @@ class RedisQueue implements Queue
             $this->redis->hSet($this->getTaskResultKey(), $taskId, 'TaskNotFinished');
         }
         $this->redis->exec();
+
+        return $taskId;
     }
 
     public function start()
@@ -105,6 +107,8 @@ class RedisQueue implements Queue
 
         $serializedTaskResult = $this->redis->hGet($this->getTaskResultKey(), $taskId);
         $taskResult = unserialize($serializedTaskResult);
+
+        $this->redis->hDel($this->getTaskResultKey(), $taskId);
 
         return $taskResult;
     }
