@@ -1,16 +1,19 @@
 <?php
 namespace ThreadWorker;
 
-abstract class Task implements \Serializable{
-
+abstract class Task implements \Serializable
+{
     /**
      * @var array
      */
     private $parameters;
 
-    public function __construct($parameters = array())
+    /**
+     * The construct parameters used when creating a Task object will be used to call it's run() method
+     */
+    public function __construct()
     {
-        $this->parameters = (array)$parameters;
+        $this->parameters = func_get_args();
     }
 
     public function serialize()
@@ -23,14 +26,11 @@ abstract class Task implements \Serializable{
         $this->parameters = unserialize($serialized);
     }
 
-    public function getParameter($name)
+    public function __invoke()
     {
-        if (isset($this->parameters[$name])) {
-            return $this->parameters[$name];
-        }
-        return null;
+        return call_user_func_array(array($this, 'run'), $this->parameters);
     }
 
-    public abstract function run();
+    abstract protected function run();
 
 }

@@ -4,12 +4,12 @@ namespace ThreadWorker;
 class Worker {
 
     /**
-     * @var TaskQueue
+     * @var Queue
      */
     private $queue;
 
     /**
-     * @param TaskQueue $queue
+     * @param Queue $queue
      */
     public function __construct($queue)
     {
@@ -34,13 +34,18 @@ class Worker {
     }
 
     /**
-     * @param RemoteTask $task
+     * @param RemoteTask $remoteTask
      */
-    protected function runTask($task)
+    protected function runTask($remoteTask)
     {
         try {
-            $task->getTask()->run();
-        } catch (\Exception $ex) {
+            $task = $remoteTask->getTask();
+            $result = $task();
+            $taskResult = new TaskResult($result);
+            $remoteTask->done($taskResult);
+        } catch (\Exception $exception) {
+            $taskException = new TaskException($exception);
+            $remoteTask->fail($taskException);
         }
     }
 
