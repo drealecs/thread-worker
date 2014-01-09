@@ -20,6 +20,10 @@
             "ThreadWorker": "lib/"
         }
     },
+    "bin": [
+        "bin/worker",
+        "bin/worker.php"
+    ],
     "config": {
         "use-include-path": true
     }
