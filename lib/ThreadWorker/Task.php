@@ -13,6 +13,7 @@ abstract class Task implements \Serializable
      */
     public function __construct()
     {
+        $this->checkImplementation();
         $this->parameters = func_get_args();
     }
 
@@ -23,6 +24,7 @@ abstract class Task implements \Serializable
 
     public function unserialize($serialized)
     {
+        $this->checkImplementation();
         $this->parameters = unserialize($serialized);
     }
 
@@ -30,7 +32,12 @@ abstract class Task implements \Serializable
     {
         return call_user_func_array(array($this, 'run'), $this->parameters);
     }
-
-    abstract protected function run();
+    
+    private function checkImplementation()
+    {
+        if (!method_exists($this, 'run')) {
+            throw new \Exception('Wrong implementation extending ThreadWorker\Task class. A protected or public method names run() must be defined.');
+        }
+    }
 
 }
