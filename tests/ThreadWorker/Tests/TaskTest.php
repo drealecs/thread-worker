@@ -5,23 +5,27 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 {
     public function testTaskRun()
     {
-        $task = $this->getMock('ThreadWorker\Task', array('run'), array('testParam1', 'testParam2'), 'MockTask');
+        $testParam1 = 'testString1';
+        $testParam2 = 'testString2';
+        $testReturnValue = 'testString3';
+
+        $task = $this->getMock('ThreadWorker\Task', array('run'), array($testParam1, $testParam2));
         $task->expects($this->once())
             ->method('run')
-            ->with('testParam1', 'testParam2')
-            ->will($this->returnValue('testResult'));
-        
-        $this->assertEquals('testResult', $task());
+            ->with($testParam1, $testParam2)
+            ->will($this->returnValue($testReturnValue));
+
+        $this->assertEquals($testReturnValue, $task());
 
         $serializedTask = serialize($task);
         $task = unserialize($serializedTask);
         
         $task->expects($this->once())
             ->method('run')
-            ->with('testParam1', 'testParam2')
-            ->will($this->returnValue('testResult'));
+            ->with($testParam1, $testParam2)
+            ->will($this->returnValue($testReturnValue));
         
-        $this->assertEquals('testResult', $task());
+        $this->assertEquals($testReturnValue, $task());
     }
     
     public function testTaskBadImplementation()
