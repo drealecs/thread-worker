@@ -24,7 +24,7 @@ class TaskResult implements \Serializable
         $this->result = unserialize($serialized);
     }
 
-    public function getResult()
+    public function getValue()
     {
         return $this->result;
     }
