@@ -35,8 +35,9 @@ class RedisQueue implements Queue
             $this->redis->hSet($this->getTaskResultKey(), $taskId, 'TaskNotFinished');
         }
         $this->redis->exec();
-
-        return $taskId;
+        if ($captureResult) {
+            return $taskId;
+        }
     }
 
     public function start()
