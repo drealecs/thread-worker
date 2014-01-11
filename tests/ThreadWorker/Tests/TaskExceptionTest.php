@@ -3,7 +3,7 @@ namespace ThreadWorker\Tests;
 
 use ThreadWorker\TaskException;
 
-class TaskExceptiontTest extends \PHPUnit_Framework_TestCase
+class TaskExceptionTest extends \PHPUnit_Framework_TestCase
 {
     public function testTaskExceptionEncapsulation()
     {
