@@ -4,20 +4,27 @@ namespace ThreadWorker;
 class TaskLazyResult extends TaskResult
 {
     /**
-     * @var QueuedTask
+     * @var Queue
      */
-    private $queuedTask;
+    private $queue;
 
     /**
-     * @param QueuedTask $queuedTask
+     * @var string|int
      */
-    public function __construct($queuedTask)
+    private $id;
+
+    /**
+     * @param Queue $queue
+     * @param string|int $id
+     */
+    public function __construct($queue, $id)
     {
-        $this->queuedTask = $queuedTask;
+        $this->queue = $queue;
+        $this->id = $id;
     }
 
     public function getValue()
     {
-        return $this->queuedTask->getResult()->getValue();
+        return $this->queue->getResult($this->id)->getValue();
     }
 }
