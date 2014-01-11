@@ -60,14 +60,7 @@ final class QueuedTask {
      */
     public function getResult()
     {
-        $result = $this->queue->getResult($this->id);
-        if ($result instanceof TaskException) {
-            throw $result;
-        }
-        if ($result instanceof TaskResult) {
-            return $result;
-        }
-        return null;
+        return $this->queue->getResult($this->id);
     }
 
 }

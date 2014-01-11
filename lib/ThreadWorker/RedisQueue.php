@@ -111,6 +111,10 @@ class RedisQueue implements Queue
 
         $this->redis->hDel($this->getTaskResultKey(), $taskId);
 
+        if ($taskResult instanceof TaskException) {
+            throw $taskResult;
+        }
+
         return $taskResult;
     }
 

@@ -22,7 +22,8 @@ interface Queue
 
     /**
      * @param string|int $taskId
-     * @return TaskResult|TaskException|null
+     * @return TaskResult|null
+     * @throws TaskException
      */
     public function getResult($taskId);
 
