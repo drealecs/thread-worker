@@ -160,7 +160,7 @@ class RedisQueue implements Queue
 
     public function getRunningSize()
     {
-        return (int)$this->redis->hLen($this->getTaskRunKey());
+        return (int)$this->redis->lLen($this->getTaskRunKey());
     }
 
     public function isQueued($taskId)
@@ -191,7 +191,11 @@ class RedisQueue implements Queue
      */
     public function isFinished($taskId)
     {
-        return $this->redis->hExists($this->getTaskResultKey(), $taskId);
+        $this->redis->multi();
+        $this->redis->hExists($this->getTaskKey(), $taskId);
+        $this->redis->hExists($this->getTaskResultKey(), $taskId);
+        list($taskExists, $taskResultExists) = $this->redis->exec();
+        return !$taskExists && $taskResultExists;
     }
 
     /**
