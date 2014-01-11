@@ -194,4 +194,17 @@ class RedisQueue implements Queue
         return $this->redis->hExists($this->getTaskResultKey(), $taskId);
     }
 
+    /**
+     */
+    public function clear()
+    {
+        $this->redis->del(
+            $this->getTaskKey(),
+            $this->getTaskQueueKey(),
+            $this->getTaskQueueTimeKey(),
+            $this->getTaskRunKey(),
+            $this->getTaskStartTimeKey(),
+            $this->getTaskResultKey()
+        );
+    }
 }

@@ -54,4 +54,8 @@ interface Queue
      * @return int
      */
     public function getRunningSize();
+
+    /**
+     */
+    public function clear();
 }
