@@ -22,7 +22,7 @@ class RedisQueue implements Queue
         $this->redis->connect('localhost');
     }
 
-    public function queue(Task $task, $captureResult)
+    public function queue($task, $captureResult)
     {
         $taskId = (string)Uuid::uuid4();
         $serializedTask = serialize($task);
@@ -74,7 +74,7 @@ class RedisQueue implements Queue
         }
     }
 
-    public function end(RemoteTask $task)
+    public function end($task)
     {
         $taskId = $task->getId();
 

@@ -8,7 +8,7 @@ interface Queue
      * @param bool $captureResult
      * @return string|int
      */
-    public function queue(Task $task, $captureResult);
+    public function queue($task, $captureResult);
 
     /**
      * @return RemoteTask
@@ -18,7 +18,7 @@ interface Queue
     /**
      * @param RemoteTask $task
      */
-    public function end(RemoteTask $task);
+    public function end($task);
 
     /**
      * @param string|int $taskId
