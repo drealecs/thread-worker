@@ -6,6 +6,11 @@ use Rhumsaa\Uuid\Uuid;
 class RedisQueue implements Queue
 {
     /**
+     * @var int
+     */
+    private $taskTimeout = 60;
+
+    /**
      * @var string
      */
     private $type;
@@ -65,7 +70,7 @@ class RedisQueue implements Queue
         $taskIds = array_unique($this->redis->lRange($this->getTaskRunKey(), 0, -1));
         foreach ($taskIds as $taskId) {
             $time = $this->redis->hGet($this->getTaskStartTimeKey(), $taskId);
-            if (!empty($time) && time() > 60 + (int)$time) {
+            if (!empty($time) && time() > $this->taskTimeout + (int)$time) {
                 $this->redis->multi();
                 $this->redis->rPush($this->getTaskQueueKey(), $taskId);
                 $this->redis->lRem($this->getTaskRunKey(), $taskId, 1);
