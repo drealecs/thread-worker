@@ -32,10 +32,7 @@ class QueueExecutorTest extends \PHPUnit_Framework_TestCase
 
         $executor = new QueueExecutor($queue);
         $queuedTask = $executor->submit($task2);
-        $this->assertEquals($task2, $queuedTask->getTask());
-
         $queuedTask->getResult();
-
     }
 
 } 

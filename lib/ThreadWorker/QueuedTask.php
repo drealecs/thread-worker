@@ -4,11 +4,6 @@ namespace ThreadWorker;
 final class QueuedTask {
 
     /**
-     * @var Task
-     */
-    private $task;
-
-    /**
      * @var Queue
      */
     private $queue;
@@ -18,16 +13,10 @@ final class QueuedTask {
      */
     private $id;
 
-    public function __construct(Task $task, $id, Queue $queue)
+    public function __construct($id, Queue $queue)
     {
-        $this->task = $task;
         $this->queue = $queue;
         $this->id = $id;
-    }
-
-    public function getTask()
-    {
-        return $this->task;
     }
 
     /**

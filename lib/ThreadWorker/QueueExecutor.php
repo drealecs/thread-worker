@@ -24,7 +24,7 @@ class QueueExecutor implements Executor
     public function submit($task)
     {
         $taskId = $this->queue->queue($task, true);
-        return new QueuedTask($task, $taskId, $this->queue);
+        return new QueuedTask($taskId, $this->queue);
     }
 
 
