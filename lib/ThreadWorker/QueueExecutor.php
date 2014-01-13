@@ -8,6 +8,9 @@ class QueueExecutor implements Executor
      */
     private $queue;
 
+    /**
+     * @param Queue $queue
+     */
     public function __construct($queue)
     {
         $this->queue = $queue;
