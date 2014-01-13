@@ -3,13 +3,30 @@ namespace ThreadWorker;
 
 abstract class RedisTask extends Task
 {
+
+    /**
+     * @var RedisQueueExecutor[]
+     */
+    private static $executorInstances = array();
+
+    /**
+     * @param string $type
+     * @return RedisQueueExecutor
+     */
+    private static function getRedisQueueExecutorInstance($type)
+    {
+        if (!isset(self::$executorInstances[$type])) {
+            self::$executorInstances[$type] = new RedisQueueExecutor($type);
+        }
+        return self::$executorInstances[$type];
+    }
+
     /**
      * @param string $type
      */
     public function execute($type)
     {
-        $executor = new RedisQueueExecutor($type);
-        $executor->execute($this);
+        $this->executeTask($this, $type);
     }
 
     /**
@@ -18,8 +35,31 @@ abstract class RedisTask extends Task
      */
     public function submit($type)
     {
-        $executor = new RedisQueueExecutor($type);
-        $queuedTask = $executor->submit($this);
+        return $this->submitTask($this, $type);
+    }
+
+    /**
+     * @param Task $task
+     * @param string $type
+     */
+    public function executeTask($task, $type)
+    {
+        $executor = self::getRedisQueueExecutorInstance($type);
+        $executor->execute($task);
+    }
+
+    /**
+     * @param Task $task
+     * @param string $type
+     * @return \ThreadWorker\TaskResult
+     */
+    public function submitTask($task, $type)
+    {
+        $executor = self::getRedisQueueExecutorInstance($type);
+        $queuedTask = $executor->submit($task);
         return $queuedTask->getLazyResult();
     }
+
+
+
 }

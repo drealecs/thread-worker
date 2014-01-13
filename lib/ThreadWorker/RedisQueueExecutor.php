@@ -4,7 +4,7 @@ namespace ThreadWorker;
 class RedisQueueExecutor extends  QueueExecutor
 {
     /**
-     * @var array
+     * @var RedisQueue[]
      */
     private static $queueInstances = array();
 
@@ -17,6 +17,10 @@ class RedisQueueExecutor extends  QueueExecutor
         parent::__construct($queue);
     }
 
+    /**
+     * @param string $type
+     * @return RedisQueue
+     */
     private static function getRedisQueueInstance($type)
     {
         if (!isset(self::$queueInstances[$type])) {
