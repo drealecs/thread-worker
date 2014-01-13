@@ -20,11 +20,28 @@ class RedisQueue implements Queue
      */
     private $redis;
 
-    public function __construct($type)
+    public function __construct($type, $config = array())
     {
         $this->type = $type;
+        $this->setupRedisConnection($config);
+    }
+    
+    private function setupRedisConnection($config)
+    {
         $this->redis = new \Redis();
-        $this->redis->connect('localhost');
+        
+        if (isset($config['host'])) {
+            $host = $config['host'];
+        } else {
+            $host = 'localhost';
+        }
+
+        if (isset($config['port'])) {
+            $port = $config['port'];
+            $this->redis->pconnect($host, $port);
+        } else {
+            $this->redis->pconnect($host);
+        }
     }
 
     public function queue($task, $captureResult)
