@@ -63,4 +63,9 @@ final class QueuedTask {
         return $this->queue->getResult($this->id);
     }
 
+    public function getLazyResult()
+    {
+        return new TaskLazyResult($this->queue, $this->id);
+    }
+
 }
