@@ -8,5 +8,5 @@ if ($argc < 2) {
     die;
 }
 $type = $argv[1];
-$worker = new ThreadWorker\Worker(new ThreadWorker\RedisQueue($type));
+$worker = new ThreadWorker\RemoteExecutor(new ThreadWorker\RedisQueue($type));
 $worker->work();

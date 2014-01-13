@@ -33,5 +33,19 @@ class TaskTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('Exception');
         $task = $this->getMock('ThreadWorker\Task');
     }
+
+    public function testTaskExecutorInvoke()
+    {
+        $testParam1 = 'testString1';
+
+        $executor = $this->getMock('ThreadWorker\Executor');
+
+        $task = $this->getMock('ThreadWorker\Task', array('run'), array($testParam1));
+        $task->expects($this->once())
+            ->method('run')
+            ->with($testParam1, $executor);
+
+        $task($executor);
+    }
     
 } 

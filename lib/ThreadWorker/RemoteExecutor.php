@@ -1,8 +1,8 @@
 <?php
 namespace ThreadWorker;
 
-class Worker {
-
+class RemoteExecutor extends QueueExecutor
+{
     /**
      * @var Queue
      */
@@ -13,15 +13,16 @@ class Worker {
      */
     public function __construct($queue)
     {
+        parent::__construct($queue);
         $this->queue = $queue;
     }
 
     public function work()
     {
         while (true) {
-            $task = $this->startTask();
-            $this->runTask($task);
-            $this->endTask($task);
+            $remoteTask = $this->startTask();
+            $this->runTask($remoteTask);
+            $this->endTask($remoteTask);
         }
     }
 
@@ -40,7 +41,7 @@ class Worker {
     {
         try {
             $task = $remoteTask->getTask();
-            $result = $task();
+            $result = $task($this);
             $taskResult = new TaskResult($result);
             $remoteTask->done($taskResult);
         } catch (\Exception $exception) {
@@ -50,11 +51,11 @@ class Worker {
     }
 
     /**
-     * @param RemoteTask $task
+     * @param RemoteTask $remoteTask
      */
-    protected function endTask($task)
+    protected function endTask($remoteTask)
     {
-        $this->queue->end($task);
+        $this->queue->end($remoteTask);
     }
 
 }

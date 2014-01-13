@@ -30,7 +30,14 @@ abstract class Task implements \Serializable
 
     public function __invoke()
     {
-        return call_user_func_array(array($this, 'run'), $this->parameters);
+        $parameters = $this->parameters;
+        if (func_num_args() > 0) {
+            $executor = func_get_arg(0);
+            if ($executor instanceof Executor) {
+                array_push($parameters, $executor);
+            }
+        }
+        return call_user_func_array(array($this, 'run'), $parameters);
     }
     
     private function checkImplementation()

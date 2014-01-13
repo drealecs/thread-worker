@@ -29,16 +29,25 @@ final class RemoteTask {
         $this->id = $id;
     }
 
+    /**
+     * @return Task
+     */
     public function getTask()
     {
         return $this->task;
     }
 
+    /**
+     * @return int|string
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * @param TaskResult $result
+     */
     public function done($result)
     {
         if (!$this->isFinished()) {
@@ -46,6 +55,9 @@ final class RemoteTask {
         }
     }
 
+    /**
+     * @param TaskException $exception
+     */
     public function fail($exception)
     {
         if (!$this->isFinished()) {
@@ -53,11 +65,17 @@ final class RemoteTask {
         }
     }
 
+    /**
+     * @return bool
+     */
     private function isFinished()
     {
         return isset($this->result) || isset($this->exception);
     }
 
+    /**
+     * @return TaskException|TaskResult
+     */
     public function getResult()
     {
         return isset($this->result) ? $this->result : $this->exception;
