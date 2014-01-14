@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Thread-worker by drealecs</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Thread-worker</h1>
+        <p>PHP multi-thread worker message based library</p>
+
+        <p class="view"><a href="https://github.com/drealecs/thread-worker">View the Project on GitHub <small>drealecs/thread-worker</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/drealecs/thread-worker/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/drealecs/thread-worker/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/drealecs/thread-worker">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="drealecsthread-worker" class="anchor" href="#drealecsthread-worker"><span class="octicon octicon-link"></span></a>drealecs/thread-worker</h1>
+
+<p>PHP multi-thread-worker message/event library
+<a href="http://travis-ci.org/drealecs/thread-worker"><img src="https://secure.travis-ci.org/drealecs/thread-worker.png?branch=master" alt="Build Status"></a></p>
+
+<h2>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>Thread-worker is a library that allows execution of tasks in parallel by multiple PHP processes
+on the same computer or on different computers.</p>
+
+<p>The library has a lot of concepts borrowed from other languages.</p>
+
+<h2>
+<a name="concepts" class="anchor" href="#concepts"><span class="octicon octicon-link"></span></a>Concepts</h2>
+
+<ul>
+<li><p><strong>Task</strong> represents a function that should be executed asynchronously.</p></li>
+<li><p><strong>Queue</strong> is a queue of tasks. Tasks can be put into queue by a process and taken out for execution by another process.</p></li>
+<li><p><strong>Executor</strong> is an wrapper over a queue. It can be passed to running task so that those tasks can spawn more tasks.</p></li>
+<li><p><strong>TaskResult</strong> or <strong>TaskException</strong> are the result of a <strong>Task</strong>.</p></li>
+</ul><p><strong>Task</strong>, <strong>TaskResult</strong> and <strong>TaskException</strong> are the entities that are being serialized as "messages" and write to/read from the queue.</p>
+
+<h2>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h2>
+
+<h3>
+<a name="task" class="anchor" href="#task"><span class="octicon octicon-link"></span></a>Task</h3>
+
+<p>A code that will be executed remotely cannot share variables or context with the calling code. When defining a function
+that can be executed asynchronously it must be created as a Task by extending \ThreadWorker\Task and implementing method <code>run()</code>:</p>
+
+<div class="highlight highlight-php"><pre><span class="k">class</span> <span class="nc">AddTask</span> <span class="k">extends</span> <span class="nx">ThreadWorker\Task</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">run</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nx">returns</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>and after that, the task can be used in this way:</p>
+
+<div class="highlight highlight-php"><pre><span class="nv">$task</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AddTask</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$task</span><span class="p">();</span>
+</pre></div>
+
+<p>and this will make <code>$result</code> equals 8.</p>
+
+<p>Just like a function, a task can return a value or not.</p>
+
+<p>Of course, the example above execute a task locally, synchronously. To execute it asynchronously we will need a Queue and an Executor.</p>
+
+<h3>
+<a name="queue" class="anchor" href="#queue"><span class="octicon octicon-link"></span></a>Queue</h3>
+
+<p>To synchronize working tasks a queue concept is being used.</p>
+
+<p>There is a queue, someone puts a task in the queue and there are workers that take it and run it.</p>
+
+<p>Interface of a task queue:</p>
+
+<ul>
+<li><p>public function queue($task, $captureResult); - called to queue a task for execution. There are Tasks that don't return a result and Tasks that returns a result.
+A task that does not returns a result is usually preferable because the calling code can do other things and get out of scope or even finish execution.
+To accomplish this <code>$captureResult</code> must be <code>false</code> in which case the methods does not returns anything.
+If we need a execute multiple task remotely and join their result we might need to pass second parameter as <code>true</code> and <code>queue()</code> method will return a task
+identifier that can be used later to query and retrieve the task result.</p></li>
+<li><p>public function start() - called by the script that can execute a task. This is a blocking method and it blocks until there is a task in the queue.
+It returns a RemoteTask which is a container for the Task and it's TaskResult.</p></li>
+<li><p>public function end($remoteTask) - called by the script that executed the task. It marks the task a being finished and it task is one that returns
+a response, it stores the TaskResult.</p></li>
+<li><p>public function getResult($taskId) - usually called by the script that queued the task for execution. It can be called only one time and is blocking
+until the task finished to execute.</p></li>
+<li><p>public function isQueued|isRunning|isFinished($taskId) - methods that can query the state of a task.</p></li>
+<li><p>public function getQueueSize() and getRunningSize() - methods that can query the queue for it's current workflow capacity.</p></li>
+</ul><p>Currently there is only one implementation of Queue: \ThreadWorker\RedisQueue and there are plans for: AMQPQueue, MySQLQueue</p>
+
+<h3>
+<a name="executor" class="anchor" href="#executor"><span class="octicon octicon-link"></span></a>Executor</h3>
+
+<p>Executor wraps a queue and provide a simpler interface to queue task and work on tasks and get task results.</p>
+
+<p>There is a QueueExecutor that has 2 methods:</p>
+
+<ul>
+<li>void execute(Task $task) - adds the task to the queue</li>
+<li>QueuedTask submit(Task $task) - adds the task to the queue and returns a QueuedTask instance that can be used to query task status and retrieve the task result.</li>
+</ul><p>Let's look at an example:</p>
+
+<div class="highlight highlight-php"><pre><span class="nv">$queue</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ThreadWorker\RedisQueue</span><span class="p">(</span><span class="s1">'example'</span><span class="p">);</span>
+<span class="nv">$executor</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ThreadWorker\QueueExecutor</span><span class="p">(</span><span class="nv">$queue</span><span class="p">);</span>
+
+<span class="nv">$task</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AddTask</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+<span class="nv">$queuedTask</span> <span class="o">=</span> <span class="nv">$executor</span><span class="o">-&gt;</span><span class="na">submit</span><span class="p">(</span><span class="nv">$task</span><span class="p">);</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$queuedTask</span><span class="o">-&gt;</span><span class="na">getResult</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">();</span>
+</pre></div>
+
+<p>QueueExecutor is extended into RemoteExecutor that does the asynchronous running of the tasks.
+Worker's code would look like this:</p>
+
+<div class="highlight highlight-php"><pre><span class="nv">$queue</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ThreadWorker\RedisQueue</span><span class="p">(</span><span class="s1">'example'</span><span class="p">);</span>
+<span class="nv">$worker</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ThreadWorker\RemoteExecutor</span><span class="p">(</span><span class="nv">$queue</span><span class="p">);</span>
+
+<span class="nv">$worker</span><span class="o">-&gt;</span><span class="na">work</span><span class="p">();</span>
+</pre></div>
+
+<p>An instance of RemoteExecutor is passed as an extra parameter to the <code>run()</code> method of the task and can be use to queue more tasks.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/drealecs">drealecs</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
