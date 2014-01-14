@@ -15,6 +15,7 @@ abstract class Task implements \Serializable
     {
         $this->checkImplementation();
         $this->parameters = func_get_args();
+        $this->init();
     }
 
     public function serialize()
@@ -26,6 +27,7 @@ abstract class Task implements \Serializable
     {
         $this->checkImplementation();
         $this->parameters = unserialize($serialized);
+        $this->init();
     }
 
     public function __invoke()
@@ -38,6 +40,10 @@ abstract class Task implements \Serializable
             }
         }
         return call_user_func_array(array($this, 'run'), $parameters);
+    }
+    
+    protected function init()
+    {
     }
     
     private function checkImplementation()
