@@ -1,8 +1,8 @@
 {
     "name": "drealecs/thread-worker",
 	"type": "library",
-	"description": "PHP Thread Worker library",
-	"keywords": ["thread", "worker"],
+	"description": "PHP multi-thread worker message based library",
+	"keywords": ["thread", "worker", "asynchronous", "multithread", "threads"],
     "license": "MIT",
 	"authors": [
         {
