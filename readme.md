@@ -51,3 +51,43 @@ $result = $task();
 and this will make `$result` equals 8.
 
 Just like a function, a task can return a value or not.
+
+Of course, the example above execute a task locally, synchronously. To execute it asynchronously we will need a Queue and an Executor.
+
+### Queue
+
+To synchronize working tasks a queue concept is being used.
+
+There is a queue, someone puts a task in the queue and there are workers that take it and run it.
+
+
+Interface of a task queue:
+
+ - public function queue($task, $captureResult); - called to queue a task for execution. There are Tasks that don't return a result and Tasks that returns a result.
+A task that does not returns a result is usually preferable because the calling code can do other things and get out of scope or even finish execution.
+To accomplish this `$captureResult` must be `false` in which case the methods does not returns anything.
+If we need a execute multiple task remotely and join their result we might need to `$captureResult` to `true` and `queue()` method will return a task
+identifier that can be used later to query and retrieve the task result.
+
+ - public function start() - called by the script that can execute a task. This is a blocking method and it blocks until there is a task in the queue.
+It returns a RemoteTask which is a container for the Task and it's TaskResult.
+
+ - public function end($remoteTask) - called by the script that executed the task. It marks the task a being finished and it task is one that returns
+a response, it stores the TaskResult.
+
+ - public function getResult($taskId) - usually called by the script that queued the task for execution. It can be called only one time and is blocking
+until the task finished to execute.
+
+ - public function isQueued|isRunning|isFinished($taskId) - methods that can query the state of a task.
+
+ - public function getQueueSize() and getRunningSize() - methods that can query the queue for it's current workflow capacity.
+
+Currently there is only one implementation of Queue: \ThreadWorker\RedisQueue and there are plans for: AMQPQueue, MySQLQueue
+
+
+### Executor
+
+Executor wraps a queue and provide a nice interface to queue task and work on tasks.
+
+
+
