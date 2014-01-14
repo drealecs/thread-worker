@@ -87,7 +87,32 @@ Currently there is only one implementation of Queue: \ThreadWorker\RedisQueue an
 
 ### Executor
 
-Executor wraps a queue and provide a nice interface to queue task and work on tasks.
+Executor wraps a queue and provide a simpler interface to queue task and work on tasks and get task results.
 
+There is a QueueExecutor that has 2 methods:
 
+ - void execute(Task $task) - adds the task to the queue
+ - QueuedTask submit(Task $task) - adds the task to the queue and returns a QueuedTask instance that can be used to query task status and retrieve the task result.
 
+Let's look at an example:
+
+``` php
+$queue = new ThreadWorker\RedisQueue('example');
+$executor = new ThreadWorker\QueueExecutor($queue);
+
+$task = new AddTask(3, 5);
+$queuedTask = $executor->submit($task);
+$result = $queuedTask->getResult()->getValue();
+```
+
+QueueExecutor is extended into RemoteExecutor that does the asynchronous running of the tasks.
+Worker's code would look like this:
+
+``` php
+$queue = new ThreadWorker\RedisQueue('example');
+$worker = new ThreadWorker\RemoteExecutor($queue);
+
+$worker->work();
+```
+
+An instance of RemoteExecutor is passed as an extra parameter to the `run()` method of the task and can be use to queue more tasks.
