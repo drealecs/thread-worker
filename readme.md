@@ -66,7 +66,7 @@ Interface of a task queue:
  - public function queue($task, $captureResult); - called to queue a task for execution. There are Tasks that don't return a result and Tasks that returns a result.
 A task that does not returns a result is usually preferable because the calling code can do other things and get out of scope or even finish execution.
 To accomplish this `$captureResult` must be `false` in which case the methods does not returns anything.
-If we need a execute multiple task remotely and join their result we might need to `$captureResult` to `true` and `queue()` method will return a task
+If we need a execute multiple task remotely and join their result we might need to pass second parameter as `true` and `queue()` method will return a task
 identifier that can be used later to query and retrieve the task result.
 
  - public function start() - called by the script that can execute a task. This is a blocking method and it blocks until there is a task in the queue.
