@@ -21,7 +21,7 @@ Concepts
 
  - **Queue** is a queue of tasks. Tasks can be put into queue by a process and taken out for execution by another process.
 
- - **Executor** is an wrapper over a queue. It can be passed to running task so that those tasks can spawn more tasks.
+ - **Executor** is an wrapper over a queue. Tasks will be passed to it in one PHP script and in another php script **RemoteExecutor** will be used to work on those tasks.
 
  - **TaskResult** or **TaskException** are the result of a **Task**.
 
